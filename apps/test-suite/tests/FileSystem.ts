@@ -2620,6 +2620,63 @@ export async function test({ describe, expect, it, ...t }) {
         archive.close();
       }
     });
+
+    it('Symbol.dispose can be called directly without throwing', () => {
+      const archiveFile = createTestArchive();
+      const archive = archiveFile.openAsArchive();
+      try {
+        archive[Symbol.dispose]();
+        // Calling again should also not throw (idempotent like close())
+        archive[Symbol.dispose]();
+      } finally {
+        archive.close();
+      }
+    });
+
+    it('Throws when calling list() on a closed archive', () => {
+      const archiveFile = createTestArchive();
+      const archive = archiveFile.openAsArchive();
+      archive.close();
+      expect(() => archive.list()).toThrow();
+    });
+
+    it('Throws when calling extractEntry() on a closed archive', async () => {
+      const archiveFile = createTestArchive();
+      const archive = archiveFile.openAsArchive();
+      archive.close();
+      const dest = new Directory(zipTestDir, 'closed_extract');
+      dest.create();
+      await expect(archive.extractEntry('hello.txt', dest)).rejects.toThrow();
+    });
+
+    it('Throws when extracting a non-existent entry', async () => {
+      const archiveFile = createTestArchive();
+      const archive = archiveFile.openAsArchive();
+      try {
+        const dest = new Directory(zipTestDir, 'nonexistent_entry');
+        dest.create();
+        await expect(archive.extractEntry('does_not_exist.txt', dest)).rejects.toThrow();
+      } finally {
+        archive.close();
+      }
+    });
+
+    if (Platform.OS === 'android') {
+      it('Entry crc32 is a number on Android', () => {
+        const archiveFile = createTestArchive();
+        const archive = archiveFile.openAsArchive();
+        try {
+          const entries = archive.list();
+          const fileEntries = entries.filter((e: ZipEntry) => !e.isDirectory);
+          expect(fileEntries.length).toBeGreaterThan(0);
+          for (const entry of fileEntries) {
+            expect(typeof entry.crc32).toBe('number');
+          }
+        } finally {
+          archive.close();
+        }
+      });
+    }
   });
 
   addAppleAppGroupsTestSuiteAsync({ describe, expect, it, ...t });
