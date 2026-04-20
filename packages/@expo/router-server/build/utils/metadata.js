@@ -1,7 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.serializeMetadataToTags = serializeMetadataToTags;
 exports.serializeMetadataToHtml = serializeMetadataToHtml;
+exports.serializeMetadataToReactElements = serializeMetadataToReactElements;
+const react_1 = __importDefault(require("react"));
 function escapeHtmlAttribute(value) {
     return value
         .replace(/&/g, '&amp;')
@@ -206,5 +211,16 @@ function serializeMetadataToTags(metadata) {
 }
 function serializeMetadataToHtml(metadata) {
     return serializeMetadataToTags(metadata).map(renderMetadataTag).join('');
+}
+function serializeMetadataToReactElements(metadata) {
+    return serializeMetadataToTags(metadata).map((tag, index) => {
+        if (tag.tagName === 'title') {
+            return react_1.default.createElement('title', { key: `metadata-title-${index}` }, tag.content ?? '');
+        }
+        return react_1.default.createElement(tag.tagName, {
+            key: `metadata-${tag.tagName}-${index}`,
+            ...(tag.attributes ?? {}),
+        });
+    });
 }
 //# sourceMappingURL=metadata.js.map

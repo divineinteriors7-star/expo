@@ -50,7 +50,7 @@ async function resolveMetadata(options) {
     }
     return {
         metadata,
-        headTags: (0, metadata_1.serializeMetadataToHtml)(metadata),
+        headNodes: (0, metadata_1.serializeMetadataToReactElements)(metadata),
     };
 }
 //# sourceMappingURL=metadata.js.map

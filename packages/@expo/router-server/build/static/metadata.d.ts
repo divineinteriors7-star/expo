@@ -1,4 +1,5 @@
 import type { Metadata } from 'expo-server';
+import type React from 'react';
 type ResolveMetadataOptions = {
     route: {
         file: string;
@@ -9,7 +10,7 @@ type ResolveMetadataOptions = {
 };
 type ResolvedMetadata = {
     metadata: Metadata;
-    headTags: string;
+    headNodes: React.ReactNode[];
 };
 export declare function resolveMetadata(options: ResolveMetadataOptions): Promise<ResolvedMetadata | null>;
 export {};

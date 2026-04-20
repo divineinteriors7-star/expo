@@ -12,15 +12,19 @@ exports.Html = Html;
  */
 const html_1 = require("expo-router/html");
 const react_1 = __importDefault(require("react"));
-function Html({ children }) {
-    return (<html lang="en">
+function Html({ bodyAttributes, bodyNodes, children, headNodes, htmlAttributes, }) {
+    return (<html lang="en" {...htmlAttributes}>
       <head>
         <meta charSet="utf-8"/>
         <meta httpEquiv="X-UA-Compatible" content="IE=edge"/>
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
         <html_1.ScrollViewStyleReset />
+        {headNodes}
       </head>
-      <body>{children}</body>
+      <body {...bodyAttributes}>
+        {children}
+        {bodyNodes}
+      </body>
     </html>);
 }
 //# sourceMappingURL=html.js.map

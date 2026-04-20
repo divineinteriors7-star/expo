@@ -1,3 +1,5 @@
+import React from 'react';
+
 import type {
   Metadata,
   MetadataIconDescriptor,
@@ -271,4 +273,17 @@ export function serializeMetadataToTags(metadata: Metadata): MetadataTag[] {
 
 export function serializeMetadataToHtml(metadata: Metadata): string {
   return serializeMetadataToTags(metadata).map(renderMetadataTag).join('');
+}
+
+export function serializeMetadataToReactElements(metadata: Metadata): React.ReactNode[] {
+  return serializeMetadataToTags(metadata).map((tag, index) => {
+    if (tag.tagName === 'title') {
+      return React.createElement('title', { key: `metadata-title-${index}` }, tag.content ?? '');
+    }
+
+    return React.createElement(tag.tagName, {
+      key: `metadata-${tag.tagName}-${index}`,
+      ...(tag.attributes ?? {}),
+    });
+  });
 }
