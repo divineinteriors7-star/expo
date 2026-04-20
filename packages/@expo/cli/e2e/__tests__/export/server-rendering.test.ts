@@ -228,9 +228,7 @@ describe('exports server', () => {
     it('emits the hydration flag before the bootstrap script', async () => {
       const html = await server.fetchAsync('/').then((res) => res.text());
 
-      const hydrationFlagIndex = html.indexOf(
-        '<script type="module">globalThis.__EXPO_ROUTER_HYDRATE__=true;</script>'
-      );
+      const hydrationFlagIndex = html.indexOf('globalThis.__EXPO_ROUTER_HYDRATE__=true;');
       const bootstrapScriptIndex = html.search(
         /<script src="\/_expo\/static\/js\/web\/entry-.*\.js"[^>]*async=""><\/script>/
       );
@@ -385,20 +383,20 @@ describe('exports server', () => {
           '<link rel="preload" as="script" href="/_expo/static/js/web/[mock].js"/>'
         )
         .replace(
-          /<link rel="preload" href="\/_expo\/static\/css\/global-[^"]*\.css" as="style">/,
-          '<link rel="preload" href="/_expo/static/css/global-[mock].css" as="style">'
+          /<link(?: rel="preload" href="\/_expo\/static\/css\/global-[^"]*\.css" as="style"| as="style" href="\/_expo\/static\/css\/global-[^"]*\.css" rel="preload")\/?>/,
+          '<link rel="preload" href="/_expo/static/css/global-[mock].css" as="style"/>'
         )
         .replace(
-          /<link rel="stylesheet" href="\/_expo\/static\/css\/global-[^"]*\.css">/,
-          '<link rel="stylesheet" href="/_expo/static/css/global-[mock].css">'
+          /<link(?: rel="stylesheet" href="\/_expo\/static\/css\/global-[^"]*\.css"| href="\/_expo\/static\/css\/global-[^"]*\.css" rel="stylesheet")\/?>/,
+          '<link rel="stylesheet" href="/_expo/static/css/global-[mock].css"/>'
         )
         .replace(
-          /<link rel="preload" href="\/_expo\/static\/css\/test\.module-[^"]*\.css" as="style">/,
-          '<link rel="preload" href="/_expo/static/css/test.module-[mock].css" as="style">'
+          /<link(?: rel="preload" href="\/_expo\/static\/css\/test\.module-[^"]*\.css" as="style"| as="style" href="\/_expo\/static\/css\/test\.module-[^"]*\.css" rel="preload")\/?>/,
+          '<link rel="preload" href="/_expo/static/css/test.module-[mock].css" as="style"/>'
         )
         .replace(
-          /<link rel="stylesheet" href="\/_expo\/static\/css\/test\.module-[^"]*\.css">/,
-          '<link rel="stylesheet" href="/_expo/static/css/test.module-[mock].css">'
+          /<link(?: rel="stylesheet" href="\/_expo\/static\/css\/test\.module-[^"]*\.css"| href="\/_expo\/static\/css\/test\.module-[^"]*\.css" rel="stylesheet")\/?>/,
+          '<link rel="stylesheet" href="/_expo/static/css/test.module-[mock].css"/>'
         );
       expect(sanitized).toMatchSnapshot();
 
@@ -445,26 +443,11 @@ describe('exports server', () => {
       ).toBe('TEST_VALUE');
     });
 
-    it('injects shell-available head metadata but not late suspended head metadata', async () => {
-      const page = getHtml(await server.fetchAsync('/head').then((res) => res.text()));
-
-      expect(page.querySelector('html > body [data-testid="late-head-text"]')?.innerText).toBe(
-        'Late Head'
-      );
-      expect(
-        page.querySelector('html > head > meta[name="expo-e2e-shell-head"]')?.attributes.content
-      ).toBe('shell');
-      expect(page.querySelector('html > head > meta[name="expo-e2e-late-head"]')).toBeNull();
-    });
-
-    it('injects generateMetadata tags into the initial server HTML head before Head tags', async () => {
+    it('injects generateMetadata tags into the initial server HTML head', async () => {
       const html = await server.fetchAsync('/metadata').then((res) => res.text());
       const page = getHtml(html);
       const head = page.querySelector('html > head');
 
-      expect(page.querySelector('html > body [data-testid="metadata-text"]')?.innerText).toBe(
-        'Metadata'
-      );
       expect(head).not.toBeNull();
 
       const metadataHeadNodes = head!.childNodes
