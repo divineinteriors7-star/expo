@@ -447,6 +447,7 @@ export default function TestScreen({ route }: { route: { params?: { tests?: stri
       <Suites
         failedCount={failedCount}
         passedCount={passedCount}
+        selectionQuery={selectionQuery}
         results={results}
         failures={failures}
         done={done}

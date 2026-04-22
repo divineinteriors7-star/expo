@@ -77,6 +77,7 @@ type SuitesProps = {
   done: boolean;
   failedCount: number;
   passedCount: number;
+  selectionQuery?: string;
   results?: string;
   failures?: string;
   totalDuration?: number;
@@ -89,6 +90,7 @@ export default function Suites({
   done,
   failedCount,
   passedCount,
+  selectionQuery,
   results,
   failures,
   totalDuration,
@@ -132,6 +134,7 @@ export default function Suites({
         done={done}
         failedCount={failedCount}
         passedCount={passedCount}
+        selectionQuery={selectionQuery}
         results={results}
         onCancel={onCancel}
       />
@@ -152,7 +155,7 @@ export default function Suites({
         {content}
       </View>
     );
-  }, [done, failedCount, passedCount, results, onCancel, theme]);
+  }, [done, failedCount, passedCount, selectionQuery, results, onCancel, theme]);
 
   const footer = useMemo(() => {
     if (!done) {

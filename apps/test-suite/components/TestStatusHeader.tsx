@@ -23,6 +23,7 @@ type TestStatusHeaderProps = {
   done: boolean;
   failedCount: number;
   passedCount: number;
+  selectionQuery?: string;
   results?: string;
   onCancel: () => void;
 };
@@ -31,6 +32,7 @@ export default function TestStatusHeader({
   done,
   failedCount,
   passedCount,
+  selectionQuery,
   results,
   onCancel,
 }: TestStatusHeaderProps) {
@@ -39,6 +41,12 @@ export default function TestStatusHeader({
 
   return (
     <View testID="test_suite_results" style={styles.container}>
+      {/* Hidden text for Maestro E2E assertions (assertVisible matches by text content) */}
+      {selectionQuery ? (
+        <Text style={styles.hidden} pointerEvents="none">
+          {selectionQuery}
+        </Text>
+      ) : null}
       {!done && (
         <View style={styles.statusRow}>
           <ActivityIndicator size="small" />
@@ -59,9 +67,6 @@ export default function TestStatusHeader({
       )}
       {done && (
         <View testID="test_suite_text_results" style={styles.countsRow}>
-          {failedCount === 0 && (
-            <Text style={[styles.status, { color: theme.text.success }]}>Success!</Text>
-          )}
           <Text style={[styles.status, { color: theme.text.success }]}>
             {passedCount}/{totalCount} passed
           </Text>
@@ -70,8 +75,14 @@ export default function TestStatusHeader({
           )}
         </View>
       )}
+      {/* Hidden text for Maestro E2E assertions */}
+      {done && failedCount === 0 && (
+        <Text style={styles.hidden} pointerEvents="none">
+          Success!
+        </Text>
+      )}
       {done && (
-        <Text style={styles.finalResults} pointerEvents="none" testID="test_suite_final_results">
+        <Text style={styles.hidden} pointerEvents="none" testID="test_suite_final_results">
           {results}
         </Text>
       )}
@@ -103,7 +114,7 @@ const styles = StyleSheet.create({
   spacer: {
     flex: 1,
   },
-  finalResults: {
+  hidden: {
     position: 'absolute',
     opacity: 0,
   },
